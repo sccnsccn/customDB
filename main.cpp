@@ -929,34 +929,120 @@ void encodeFile(const char * dbName, const char * encodedFile, CodeTable & table
 	delete[] encodedData;
 }
 
+void menu()
+{
+		cout << "select action:" << endl;
+		cout << "1. show top 20" << endl;
+		cout << "2. sorted data" << endl;
+		cout << "3. find by key" << endl;
+		cout << "4. build tree" << endl;
+		cout << "5. find into tree" << endl;
+		cout << "6. show code table" << endl;
+		cout << "7. show avg len code word" << endl;
+		cout << "8. save compress file" << endl;
+		cout << "0. exit" << endl;
+}
+
+
 int main()
 {
 	
 	const int countItemDB = 4000;
 	const char* dbName = "testBase1.dat";
 	const char* encodeDbName = "testBase1_encode.dat";
-	
-	ListItem * dataBase = readDataBase(dbName, countItemDB);
-	//CodeTable table = getTableForCharFieldWithOutCode(dataBase);
+	ListItem* dataBase = readDataBase(dbName, countItemDB);
+	ItemDB** dataArray=0;
+	ListItem* filtredData=0;
+	BTree tree(2);
 	CodeTable table = getTableForDB(dbName);
 	calcCodeShannonFano(table);
-	showCodeTableProbabilityCharacter(table);
-	cout << "entropy file: " << calcEntropy(table) << endl;
-	cout << "mean len code: " << meanLenCode(table) << endl;
-	encodeFile(dbName, encodeDbName, table);
 
-	//mergeSort(&dataBase);
+	int action = 0;
 
-	//printHeadDataBase(dataBase, 0, 100);
+	while (1)
+	{
+		menu();
+		cin >> action;
 
-	//ItemDB ** dataArray = toArray(dataBase, countItemDB);
+		if (action == 1)
+		{
+			printHeadDataBase(dataBase, 0, 20);
+		}
+		else if (action == 2)
+		{
+			mergeSort(&dataBase);
+		}
+		else if (action == 3)
+		{
+			if (filtredData != 0)
+			{
+				clearMemoryDataBase(filtredData);
+			}
+			dataArray = toArray(dataBase, countItemDB);
+			char key[] = "Архипов Ltd  ";
+			filtredData = filter(dataArray, countItemDB, key);
+			printHeadDataBase(filtredData, 0, countItemDB);
+		}
+		else if (action == 4)
+		{
+			if (filtredData != 0)
+			{
+				for (ListItem * tmp = filtredData; tmp!=0; tmp = tmp->next)
+				{
+					tree.insert(tmp->data->year, tmp->data);
+				}
+				tree.traverse();
+			}
+			else
+			{
+				cout << "to do 3 " << endl;
+			}
+		}
+		else if (action == 5)
+		{
+			printHeadDataBase(tree.search(1990), 0, -1);
+		}
+		else if (action == 6)
+		{
 
-	//printItem(dataArray[0], 1);
-	//printItem(dataArray[1], 2);
-	//printItem(dataArray[2], 3);
-	//printItem(dataArray[3], 4);
+			showCodeTableProbabilityCharacter(table);
+		}
+		else if (action == 7)
+		{
+			cout << "entropy file: " << calcEntropy(table) << endl;
+			cout << "mean len code: " << meanLenCode(table) << endl;
+		}
+		else if (action == 8)
+		{
+			encodeFile(dbName, encodeDbName, table);
+		}
+		else if (action == 0)
+		{
+			break;
+		}
+	}
+	
+	//ListItem * dataBase = readDataBase(dbName, countItemDB);
+	////CodeTable table = getTableForCharFieldWithOutCode(dataBase);
+	//CodeTable table = getTableForDB(dbName);
+	//calcCodeShannonFano(table);
+	//showCodeTableProbabilityCharacter(table);
+	//cout << "entropy file: " << calcEntropy(table) << endl;
+	//cout << "mean len code: " << meanLenCode(table) << endl;
+	//encodeFile(dbName, encodeDbName, table);
 
-	char key[] = "Архипов Ltd  ";
+	////mergeSort(&dataBase);
+
+	////printHeadDataBase(dataBase, 0, 100);
+
+	////ItemDB ** dataArray = toArray(dataBase, countItemDB);
+
+	////printItem(dataArray[0], 1);
+	////printItem(dataArray[1], 2);
+	////printItem(dataArray[2], 3);
+	////printItem(dataArray[3], 4);
+
+	//char key[] = "Архипов Ltd  ";
 
 	//ListItem * filtredData = filter(dataArray, countItemDB, key);
 
